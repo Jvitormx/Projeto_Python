@@ -1,0 +1,59 @@
+Tema: Gestão de viagens corporativas
+Minimundo:
+Nome do negócio: Destino Corporativo
+No contexto de uma viagem corporativa, um ou mais funcionários de uma empresa se
+deslocam a um determinado local a trabalho e permanecem neste local por um intervalo de
+tempo. O percurso e a estadia geram despesas, que são custeadas pela própria empresa.
+Todo este processo requer cuidado e segurança por parte dos gestores, que devem
+organizar estas viagens corporativas de acordo com as políticas da empresa.
+Destino Corporativo é um sistema de gestão de viagens corporativas, concebido para
+centralizar e automatizar todo o fluxo de deslocamento de funcionários, garantindo
+segurança e conformidade com as políticas internas das empresas-cliente. Neste cenário
+onde um ou mais colaboradores se deslocam a trabalho e permanecem em um determinado
+local por um período, o sistema assegura que todos os aspectos da viagem – desde o
+planejamento até o reembolso – sejam realizados com rigor e transparência.
+No primeiro estágio, os gestores, que devem estar cadastrados previamente, são os
+responsáveis por inserir os funcionários aptos a viajar e por configurar as políticas de
+despesas. Com essas diretrizes estabelecidas, os colaboradores podem solicitar uma
+viagem através de um formulário parametrizado, que coleta informações essenciais como
+tipo, destino, datas de início e término, motivo, entre outros. É imperativo que a solicitação
+seja realizada com, pelo menos, cinco dias úteis de antecedência. Durante o preenchimento,
+a solicitação assume o status “em andamento”, e, ao ser finalizada, é automaticamente
+encaminhada ao gestor com o status “pendente” para análise.
+O fluxo de aprovação é minuciosamente gerenciado: se o gestor não aprovar a solicitação
+dentro do prazo estabelecido, a viagem é colocada em “reserva” e aguarda nova análise,
+sendo permitido um número limitado de tentativas. Ao exceder esse limite, o status é
+alterado para “negado”. Quando a solicitação é aprovada, ela passa para o status
+“aprovado” e é incorporada ao cronograma do funcionário, mas só se torna efetiva após a
+confirmação do colaborador. Caso a solicitação seja negada, ela permanece em uma pilha
+de solicitações negadas, com prazo para possível reenvio; a ausência de reenvio dentro
+desse prazo leva à exclusão da solicitação.
+Durante a viagem, todas as despesas realizadas – que são registradas detalhadamente com
+tipo, valor, data e comprovante fiscal – devem respeitar os limites do orçamento definido
+
+pela política de despesas configurada pelo gestor. O formulário de solicitação também
+verifica a compatibilidade dos dados do funcionário, como destino e tipo de viagem, com a
+política vigente, assegurando que despesas fora do orçamento não sejam reembolsadas. O
+reembolso é processado somente após a confirmação de que todas as despesas estão
+dentro do orçamento e que a viagem foi efetivamente confirmada pelo funcionário.
+Por fim, ao término de cada viagem, o sistema gera um relatório final auditável que
+consolida todas as despesas e os respectivos status de aprovação, proporcionando uma
+visão completa e transparente do processo, além de possibilitar a automação dos processos
+e a validação dos dados, reforçando o compromisso com a segurança e a eficiência
+operacional.
+
+Um funcionário representa um colaborador da empresa, propenso a solicitar viagens.
+Possui atributos como ID, nome, departamento e cargo.
+Uma viagem representa o principal processo a ser administrado pelo sistema. Contém
+informações como tipo, data de início, data de término, status, motivo e orçamento.
+Uma despesa representa um gasto realizado durante uma viagem. Possui atributos como
+tipo, valor, data e comprovante.
+Um gestor representa o responsável por administrar os processos de viagem e analisar
+relatórios finais. Possui atributos como ID, nome e departamento.
+O sistema Destino Corporativo deve permitir:
+- Planejamento de viagens (cronograma e atribuição de funcionários).
+- Parametrização de solicitações de acordo com políticas de despesas.
+- Fluxo de aprovação de viagens e despesas.
+- Registro de despesas e anexos (comprovantes fiscais).
+- Geração de relatórios consolidados e auditáveis.
+- Automação de processos e validação de dados.

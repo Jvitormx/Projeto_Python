@@ -1,0 +1,247 @@
+Caso de Uso 1: Cadastrar Gestor
+Ator Principal: Administrador do Sistema
+Interessados e Interesses:
+Empresa - Garantir que gestores autorizados gerenciem viagens.
+Sistema - Validar e armazenar dados do gestor.
+Pré-Condições: O administrador possui acesso ao módulo de cadastro.
+Pós-Condições: Gestor cadastrado pode acessar o sistema e aprovar viagens.
+Cenário de Sucesso Principal:
+- Administrador insere dados do gestor (ID, nome, departamento).
+- Sistema valida os dados e registra o gestor.
+- Sistema envia confirmação de cadastro.
+Fluxos Alternativos:
+- Dados inválidos: Se o sistema detectar dados incompletos ou duplicados (ex: ID já
+existente), exibe mensagem de erro e solicita correção.
+
+Caso de Uso 2: Cadastrar Funcionário
+Ator Principal: Gestor
+Interessados e Interesses:
+Funcionário - Necessita estar cadastrado para solicitar viagens.
+Sistema - Associar funcionários a viagens e políticas.
+Pré-Condições: Gestor está autenticado no sistema.
+Pós-Condições: Funcionário cadastrado pode solicitar viagens.
+Cenário de Sucesso Principal:
+- Gestor preenche formulário com dados do funcionário (ID, nome, departamento, cargo).
+- Sistema valida e armazena os dados.
+- Sistema notifica o gestor sobre o cadastro bem-sucedido.
+Fluxos Alternativos:
+- Funcionário já cadastrado: Se o ID ou nome já existirem no sistema, exibe alerta e
+bloqueia o cadastro.
+
+Caso de Uso 3: Solicitar Viagem
+Ator Principal: Funcionário
+Interessados e Interesses:
+Gestor - Recebe solicitação para análise.
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+Sistema - Valida antecedência mínima de 5 dias úteis.
+Pré-Condições: Funcionário está cadastrado e autenticado.
+Pós-Condições: Solicitação é enviada com status "pendente".
+Cenário de Sucesso Principal:
+- Funcionário preenche formulário (tipo, destino, datas, motivo).
+- Sistema verifica se a solicitação tem antecedência mínima de 5 dias.
+- Sistema envia solicitação para o gestor com status "pendente".
+Fluxos Alternativos:
+- Antecedência insuficiente: Se a solicitação for feita com menos de 5 dias úteis, o sistema
+bloqueia o envio e exige ajuste nas datas.
+
+Caso de Uso 4: Aprovar/Rejeitar Viagem
+Ator Principal: Gestor
+Interessados e Interesses:
+Funcionário - Recebe atualização do status da solicitação.
+Sistema - Atualiza status da viagem e agenda cronograma.
+Pré-Condições: Solicitação está no status "pendente".
+Pós-Condições: Status da solicitação é alterado para "aprovado", "negado" ou "reserva".
+Cenário de Sucesso Principal:
+- Gestor revisa os detalhes da solicitação.
+- Gestor aprova ou rejeita a solicitação.
+- Sistema atualiza o status e notifica o funcionário.
+Fluxos Alternativos:
+- Prazo de aprovação expirado: Se o gestor não responder em 2 dias úteis, o sistema altera
+o status para "reserva" e notifica o funcionário.
+- Limite de tentativas excedido: Após 3 tentativas de reenvio, o status muda para "negado
+definitivo".
+
+Caso de Uso 5: Registrar Despesa
+Ator Principal: Funcionário
+Interessados e Interesses:
+Sistema - Valida despesas contra o orçamento da viagem.
+Gestor - Auditabilidade das despesas.
+Pré-Condições: Viagem está confirmada e em andamento.
+Pós-Condições: Despesa é registrada e vinculada à viagem.
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+Cenário de Sucesso Principal:
+- Funcionário insere tipo, valor, data e comprovante fiscal da despesa.
+- Sistema verifica se a despesa está dentro do orçamento.
+- Sistema registra a despesa e associa à viagem.
+Fluxos Alternativos:
+- Despesa excede o orçamento: O sistema bloqueia o registro e alerta o funcionário sobre o
+limite ultrapassado.
+- Comprovante inválido: Se o comprovante não for um arquivo válido (ex: PDF, imagem), o
+sistema rejeita o registro.
+
+Caso de Uso 6: Reembolsar Despesas
+Ator Principal: Sistema
+Interessados e Interesses:
+Funcionário - Recebe reembolso.
+Empresa - Controla gastos conforme políticas.
+Pré-Condições: Despesas estão validadas e a viagem foi confirmada.
+Pós-Condições: Reembolso é processado e registrado.
+Cenário de Sucesso Principal:
+- Sistema valida todas as despesas da viagem.
+- Sistema integra-se ao sistema de pagamento para transferência.
+- Funcionário recebe notificação do reembolso.
+Fluxos Alternativos:
+- Falha na integração com pagamento: O sistema armazena a transação como "pendente" e
+tenta reprocessar após 24 horas.
+- Saldo insuficiente: Se a empresa não tiver fundos, o sistema notifica o gestor e suspende
+o reembolso.
+
+Caso de Uso 7: Gerar Relatório de Viagem
+Ator Principal: Gestor
+Interessados e Interesses:
+Empresa - Auditoria e transparência.
+Sistema - Consolida dados de despesas e aprovações.
+Pré-Condições: Viagem está concluída.
+Pós-Condições: Relatório auditável é disponibilizado.
+Cenário de Sucesso Principal:
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+- Sistema compila dados da viagem (despesas, status, orçamento).
+- Gestor acessa o relatório em formato PDF ou planilha.
+- Relatório é arquivado para futuras auditorias.
+Fluxos Alternativos:
+- Viagem sem despesas registradas: O sistema gera um relatório parcial, destacando a
+ausência de despesas.
+
+Caso de Uso 8: Configurar Política de Despesas
+Ator Principal: Gestor
+Interessados e Interesses:
+Sistema - Aplica políticas às solicitações e despesas.
+Funcionário - Conhece limites de gastos.
+Pré-Condições: Gestor está autenticado.
+Pós-Condições: Políticas são aplicáveis a novas solicitações.
+Cenário de Sucesso Principal:
+- Gestor define limites de orçamento por tipo de viagem.
+- Sistema atualiza as regras de validação.
+- Funcionários são notificados sobre as novas políticas.
+Fluxos Alternativos:
+- Limite inválido: Se o gestor inserir um valor negativo ou não numérico, o sistema rejeita a
+configuração.
+
+Caso de Uso 9: Confirmar Viagem
+Ator Principal: Funcionário
+Interessados e Interesses:
+Gestor - Viagem é efetivada.
+Sistema - Libera registro de despesas.
+Pré-Condições: Viagem está com status "aprovado".
+Pós-Condições: Viagem assume status "confirmada".
+Cenário de Sucesso Principal:
+- Funcionário recebe notificação de aprovação.
+- Funcionário confirma a viagem no sistema.
+- Sistema atualiza o status para "confirmada".
+Fluxos Alternativos:
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+- Confirmação fora do prazo: Se o funcionário não confirmar em 48 horas, a viagem volta
+para "aprovado" e o gestor é notificado.
+
+Caso de Uso 10: Visualizar Cronograma de Viagens
+Ator Principal: Funcionário
+Interessados e Interesses:
+Funcionário - Planejamento de atividades.
+Pré-Condições: Viagens estão agendadas ou confirmadas.
+Pós-Condições: Cronograma é exibido em formato de calendário ou lista.
+Cenário de Sucesso Principal:
+- Funcionário acessa a seção "Cronograma".
+- Sistema exibe viagens filtradas por data, destino ou status.
+- Funcionário navega pelo cronograma para planejamento.
+Fluxos Alternativos:
+- Sem viagens agendadas: O sistema exibe mensagem: "Nenhuma viagem agendada no
+período selecionado".
+
+Caso de Uso 11: Cancelar Viagem
+Ator Principal: Funcionário
+Interessados e Interesses:
+Sistema - Atualiza status e libera recursos.
+Logística - Reorganiza agenda.
+Pré-Condições: Viagem está agendada ou confirmada.
+Pós-Condições: Viagem é cancelada e removida do cronograma.
+Cenário de Sucesso Principal:
+- Funcionário seleciona a viagem a ser cancelada.
+- Sistema solicita confirmação do cancelamento.
+- Status da viagem é alterado para "cancelada".
+Fluxos Alternativos:
+- Cancelamento após início da viagem: Se a viagem já tiver começado, o sistema bloqueia o
+cancelamento e sugere ajustes no relatório final.
+
+Caso de Uso 12: Resgatar Solicitação Negada
+Ator Principal: Funcionário
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+Interessados e Interesses:
+Gestor - Reavalia solicitação ajustada.
+Sistema - Mantém histórico de alterações.
+Pré-Condições: Solicitação foi negada e está na pilha de negados.
+Pós-Condições: Solicitação retorna para análise com status "pendente".
+Cenário de Sucesso Principal:
+- Funcionário edita a solicitação negada (ex: ajusta datas).
+- Sistema valida as alterações.
+- Solicitação é reenviada para aprovação.
+Fluxos Alternativos:
+- Ajustes insuficientes: Se as alterações não resolverem o motivo da negação, o gestor
+recebe a solicitação com status "pendente ajustes".
+
+Caso de Uso 13: Excluir Solicitação Negada
+Ator Principal: Sistema
+Interessados e Interesses:
+Gestor - Mantém a fila de solicitações organizada.
+Funcionário - Não pode reenviar solicitações expiradas.
+Pré-Condições: Solicitação negada excedeu o prazo de reenvio.
+Pós-Condições: Solicitação é removida do sistema.
+Cenário de Sucesso Principal:
+- Sistema verifica o prazo de reenvio das solicitações negadas.
+- Solicitações expiradas são excluídas automaticamente.
+- Gestor e funcionário são notificados da exclusão.
+Fluxos Alternativos:
+- Erro na exclusão: Se houver falha na exclusão (ex: conexão perdida), o sistema agenda
+nova tentativa após 1 hora.
+
+Caso de Uso 14: Notificar Prazo de Aprovação
+Ator Principal: Sistema
+Interessados e Interesses:
+Gestor - Recebe alerta para análise pendente.
+Funcionário - Recebe atualização sobre o status.
+Pré-Condições: Solicitação está pendente há mais de 2 dias úteis.
+
+4MOD/2025.1 - Descrição detalhada | Sistema de gestão de viagens corporativas
+Gabriel Pestana | João Vitor Marques Xavier
+Pós-Condições: Notificação é enviada por e-mail ou no sistema.
+Cenário de Sucesso Principal:
+- Sistema identifica solicitações pendentes além do prazo.
+- Notificação automática é disparada para o gestor.
+- Gestor prioriza a análise da solicitação.
+Fluxos Alternativos:
+- Gestor ausente: Se o gestor não visualizar a notificação em 24 horas, o sistema
+encaminha para um substituto cadastrado.
+
+Caso de Uso 15: Auditar Ações do Sistema
+Ator Principal: Gestor
+Interessados e Interesses:
+Empresa - Garantir conformidade com políticas e LGPD.
+Sistema - Registrar logs de atividades.
+Pré-Condições: Ações foram registradas no sistema (ex: aprovações, despesas).
+Pós-Condições: Relatório de auditoria é gerado.
+Cenário de Sucesso Principal:
+- Gestor acessa o módulo de auditoria.
+- Sistema exibe logs de atividades filtrados por data ou usuário.
+- Gestor exporta relatório para análise de conformidade.
+Fluxos Alternativos:
+- Logs corrompidos: Se os logs estiverem incompletos, o sistema gera um alerta crítico para
+a equipe de TI.

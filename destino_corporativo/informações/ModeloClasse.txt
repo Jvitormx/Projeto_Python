@@ -1,0 +1,128 @@
+MODELO DE CLASSES (TEXTO)
+
+==============================
+Classe: Funcionario
+------------------------------
+Atributos:
+  - id: Integer
+  - nome: String
+  - departamento: String
+  - funcao: String
+Métodos:
+  + solicitarViagem(req: RequisicaoViagem): Boolean
+  + registrarDespesa(d: Despesa): Boolean
+  + confirmarViagem(v: Viagem): Boolean
+  + cancelarViagem(v: Viagem, motivo: String): Boolean
+  + resgatarSolicitacao(id: Integer): RequisicaoViagem
+  + excluirSolicitacao(id: Integer): Boolean
+Relacionamentos:
+  - Funcionario pode solicitar várias Viagens
+  - Funcionario registra Despesas relacionadas a Viagens
+
+==============================
+Classe: Viagem
+------------------------------
+Atributos:
+  - id: Integer
+  - status: String
+  - dataSaida: Date
+  - dataRetorno: Date
+  - duracaoDias: Integer
+  - orcamentoAprovado: Double
+Métodos:
+  + aprovar(): void
+  + rejeitar(): void
+  + confirmar(): void
+  + cancelar(motivo: String): void
+  + calcularDuracao(): Integer
+  + adicionarDespesa(d: Despesa): void
+Relacionamentos:
+  - Viagem é solicitada por um Funcionario
+  - Viagem pode conter várias Despesas
+  - Viagem está associada a um TipoViagem
+  - Viagem está associada a uma Localidade
+
+==============================
+Classe: Despesa
+------------------------------
+Atributos:
+  - id: Integer
+  - data: Date
+  - assunto: String
+  - gasto: Double
+  - visual: Blob
+Métodos:
+  + validarLimite(politica: PoliticaDespesa): Boolean
+  + anexarComprovante(arquivo: File): void
+Relacionamentos:
+  - Despesa está associada a uma Viagem
+
+==============================
+Classe: TipoViagem
+------------------------------
+Atributos:
+  - id: Integer
+  - motivo: String
+  - quantPessoalMaxEstimado: Integer
+  - duracaoDiasMaxEstimado: Integer
+  - motivoBase: String
+  - programacaoBase: String
+Métodos:
+  + getMotivo(): String
+  + isDuracaoValida(dias: Integer): Boolean
+  + getProgramaBase(): String
+Relacionamentos:
+  - TipoViagem é referenciado por Viagem
+
+==============================
+Classe: Localidade
+------------------------------
+Atributos:
+  - id: Integer
+  - pais: String
+  - numeroAgencia: Integer
+Métodos:
+  + listarCidades(): List<LocalidadeCidade>
+Relacionamentos:
+  - Localidade possui várias LocalidadeCidade
+  - Localidade está associada à Viagem
+
+==============================
+Classe: LocalidadeCidade
+------------------------------
+Atributos:
+  - id: Integer
+  - cidade: String
+Métodos:
+  + getNome(): String
+Relacionamentos:
+  - Pertence a uma Localidade
+
+==============================
+Classe: RequisicaoViagem
+------------------------------
+Atributos:
+  - id: Integer
+  - requisicaoOrcamento: Double
+  - quantidadePessoal: Integer
+  - motivacao: String
+  - programacaoViagem: String
+Métodos:
+  + criar(): void
+  + validarAntecedencia(minDias: Integer): Boolean
+  + calcularOrcamento(): Float
+  + enviarParaAprovacao(): void
+Relacionamentos:
+  - RequisicaoViagem é criada por Funcionario
+  - Está associada à Viagem
+
+==============================
+Classe: FuncionarioViagem
+------------------------------
+Atributos:
+  - id: Integer
+  - orcamentoPessoal: Double
+Métodos:
+  + alocarOrcamento(): void
+Relacionamentos:
+  - Relaciona Funcionario a uma Viagem com orçamento individual
