@@ -1,7 +1,7 @@
 
 # service/viagem_service.py
 # Service para regras de negócio e validação de Viagem
-from models import viagem
+from models.viagem import Viagem
 from datetime import datetime, timedelta
 
 
@@ -39,24 +39,35 @@ class ViagemService:
             return False, "Data de retorno inválida. Use o formato YYYY-MM-DD."
 
         # Não permitir viagens duplicadas para o mesmo funcionário, localidade e datas
-        viagens = viagem.listar_viagens()
+        viagens = Viagem.listar_todas()
         for v in viagens:
-            if v[1] == funcionario_id and v[3] == localidade_id and v[6] == data_saida and v[7] == data_retorno:
+            if v.funcionario_id == funcionario_id and v.localidade_id == localidade_id and v.data_saida == data_saida and v.data_retorno == data_retorno:
                 return False, "Já existe uma viagem cadastrada para este funcionário, localidade e datas."
 
         try:
-            viagem.inserir_viagem(funcionario_id, tipo_viagem_id, localidade_id, requisicao_id, 'pendente', data_saida, data_retorno, duracao_dias, orcamento_aprovado)
+            nova_viagem = Viagem(
+                funcionario_id=funcionario_id,
+                tipo_viagem_id=tipo_viagem_id,
+                localidade_id=localidade_id,
+                requisicao_id=requisicao_id,
+                status='pendente',
+                data_saida=data_saida,
+                data_retorno=data_retorno,
+                duracao_dias=duracao_dias,
+                orcamento_aprovado=orcamento_aprovado
+            )
+            nova_viagem.salvar()
             return True, "Solicitação de viagem cadastrada com sucesso."
         except Exception as e:
             return False, f"Erro ao cadastrar viagem: {str(e)}"
 
 
     def listar_viagens(self):
-        return viagem.listar_viagens()
+        return Viagem.listar_todas()
 
 
     def buscar_viagem(self, viagem_id):
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if v:
             return True, v
         else:
@@ -64,20 +75,32 @@ class ViagemService:
 
 
     def atualizar_status_viagem(self, viagem_id, novo_status):
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if not v:
             return False, "Viagem não encontrada."
         try:
-            viagem.atualizar_viagem(viagem_id, v[1], v[2], v[3], v[4], novo_status, v[6], v[7], v[8], v[9])
+            v.status = novo_status
+            v.salvar()
             return True, f"Status da viagem atualizado para '{novo_status}'."
         except Exception as e:
             return False, f"Erro ao atualizar status: {str(e)}"
 
 
     def atualizar_viagem(self, viagem_id, funcionario_id, tipo_viagem_id, localidade_id, requisicao_id, status, data_saida, data_retorno, duracao_dias, orcamento_aprovado):
-        # Permite atualização completa, mas pode adicionar regras específicas se necessário
         try:
-            viagem.atualizar_viagem(viagem_id, funcionario_id, tipo_viagem_id, localidade_id, requisicao_id, status, data_saida, data_retorno, duracao_dias, orcamento_aprovado)
+            v = Viagem.buscar_por_id(viagem_id)
+            if not v:
+                return False, "Viagem não encontrada."
+            v.funcionario_id = funcionario_id
+            v.tipo_viagem_id = tipo_viagem_id
+            v.localidade_id = localidade_id
+            v.requisicao_id = requisicao_id
+            v.status = status
+            v.data_saida = data_saida
+            v.data_retorno = data_retorno
+            v.duracao_dias = duracao_dias
+            v.orcamento_aprovado = orcamento_aprovado
+            v.salvar()
             return True, "Viagem atualizada com sucesso."
         except Exception as e:
             return False, f"Erro ao atualizar viagem: {str(e)}"
@@ -85,35 +108,38 @@ class ViagemService:
 
     def remover_viagem(self, viagem_id):
         try:
-            viagem.remover_viagem(viagem_id)
+            v = Viagem.buscar_por_id(viagem_id)
+            if not v:
+                return False, "Viagem não encontrada."
+            v.remover()
             return True, "Viagem removida com sucesso."
         except Exception as e:
             return False, f"Erro ao remover viagem: {str(e)}"
 
 
     def confirmar_viagem(self, viagem_id):
-        # Confirma viagem se status for 'aprovado'
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if not v:
             return False, "Viagem não encontrada."
-        if v[5] != 'aprovado':
+        if v.status != 'aprovado':
             return False, "A viagem só pode ser confirmada se estiver com status 'aprovado'."
         try:
-            viagem.atualizar_viagem(viagem_id, v[1], v[2], v[3], v[4], 'confirmada', v[6], v[7], v[8], v[9])
+            v.status = 'confirmada'
+            v.salvar()
             return True, "Viagem confirmada com sucesso."
         except Exception as e:
             return False, f"Erro ao confirmar viagem: {str(e)}"
 
 
     def cancelar_viagem(self, viagem_id):
-        # Só permite cancelar se status for 'pendente', 'agendada' ou 'confirmada'
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if not v:
             return False, "Viagem não encontrada."
-        if v[5] not in ['pendente', 'agendada', 'confirmada']:
+        if v.status not in ['pendente', 'agendada', 'confirmada']:
             return False, "Só é possível cancelar viagens pendentes, agendadas ou confirmadas."
         try:
-            viagem.atualizar_viagem(viagem_id, v[1], v[2], v[3], v[4], 'cancelada', v[6], v[7], v[8], v[9])
+            v.status = 'cancelada'
+            v.salvar()
             return True, "Viagem cancelada com sucesso."
         except Exception as e:
             return False, f"Erro ao cancelar viagem: {str(e)}"

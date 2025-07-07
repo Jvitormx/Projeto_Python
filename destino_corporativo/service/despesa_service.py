@@ -1,7 +1,8 @@
 
 # service/despesa_service.py
 # Service para regras de negócio e validação de Despesa
-from models import despesa, viagem
+from models.despesa import Despesa
+from models.viagem import Viagem
 import mimetypes
 import os
 from datetime import datetime
@@ -36,33 +37,34 @@ class DespesaService:
                 return False, "Comprovante deve ser PDF ou imagem."
 
         # Verifica se a viagem existe e está confirmada/em andamento
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if not v:
             return False, "Viagem não encontrada."
-        if v[6] not in ['confirmada', 'em andamento']:
+        if v.status not in ['confirmada', 'em andamento']:
             return False, "Só é possível registrar despesas para viagens confirmadas ou em andamento."
 
         # Validação de orçamento (não exceder o orcamento_aprovado da viagem)
-        orcamento = v[7] if v[7] is not None else 0
-        despesas = self.listar_despesas_por_viagem(viagem_id)
-        total = sum(float(d[3]) for d in despesas) + valor
+        orcamento = v.orcamento_aprovado if v.orcamento_aprovado is not None else 0
+        despesas = Despesa.listar_por_viagem(viagem_id)
+        total = sum(float(d.valor) for d in despesas) + valor
         if orcamento > 0 and total > orcamento:
             return False, "Despesa excede o orçamento aprovado da viagem."
 
         try:
-            despesa.inserir_despesa(viagem_id, assunto, valor, data, comprovante)
+            nova_despesa = Despesa(viagem_id=viagem_id, assunto=assunto, valor=valor, data=data, comprovante=comprovante)
+            nova_despesa.salvar()
             return True, "Despesa registrada com sucesso."
         except Exception as e:
             return False, f"Erro ao registrar despesa: {str(e)}"
 
     def listar_despesas(self):
-        return despesa.listar_despesas()
+        return Despesa.listar_todas()
 
     def listar_despesas_por_viagem(self, viagem_id):
-        return [d for d in despesa.listar_despesas() if d[1] == viagem_id]
+        return Despesa.listar_por_viagem(viagem_id)
 
     def buscar_despesa(self, despesa_id):
-        d = despesa.buscar_despesa_por_id(despesa_id)
+        d = Despesa.buscar_por_id(despesa_id)
         if d:
             return True, d
         else:
@@ -86,25 +88,36 @@ class DespesaService:
             mimetype, _ = mimetypes.guess_type(nome_arquivo)
             if not mimetype or not (mimetype.startswith('image/') or mimetype == 'application/pdf'):
                 return False, "Comprovante deve ser PDF ou imagem."
-        v = viagem.buscar_viagem_por_id(viagem_id)
+        v = Viagem.buscar_por_id(viagem_id)
         if not v:
             return False, "Viagem não encontrada."
-        if v[6] not in ['confirmada', 'em andamento']:
+        if v.status not in ['confirmada', 'em andamento']:
             return False, "Só é possível registrar despesas para viagens confirmadas ou em andamento."
-        orcamento = v[7] if v[7] is not None else 0
-        despesas = self.listar_despesas_por_viagem(viagem_id)
-        total = sum(float(d[3]) for d in despesas if d[0] != despesa_id) + valor
+        orcamento = v.orcamento_aprovado if v.orcamento_aprovado is not None else 0
+        despesas = Despesa.listar_por_viagem(viagem_id)
+        total = sum(float(d.valor) for d in despesas if d.id != despesa_id) + valor
         if orcamento > 0 and total > orcamento:
             return False, "Despesa excede o orçamento aprovado da viagem."
         try:
-            despesa.atualizar_despesa(despesa_id, viagem_id, assunto, valor, data, comprovante)
+            d = Despesa.buscar_por_id(despesa_id)
+            if not d:
+                return False, "Despesa não encontrada."
+            d.viagem_id = viagem_id
+            d.assunto = assunto
+            d.valor = valor
+            d.data = data
+            d.comprovante = comprovante
+            d.salvar()
             return True, "Despesa atualizada com sucesso."
         except Exception as e:
             return False, f"Erro ao atualizar despesa: {str(e)}"
 
     def remover_despesa(self, despesa_id):
         try:
-            despesa.remover_despesa(despesa_id)
+            d = Despesa.buscar_por_id(despesa_id)
+            if not d:
+                return False, "Despesa não encontrada."
+            d.remover()
             return True, "Despesa removida com sucesso."
         except Exception as e:
             return False, f"Erro ao remover despesa: {str(e)}"

@@ -1,50 +1,59 @@
 from .database import get_connection
 
-def inserir_localidade(pais, numero_agencia):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        INSERT INTO localidade (pais, numero_agencia)
-        VALUES (?, ?)
-        """,
-        (pais, numero_agencia)
-    )
-    conn.commit()
-    conn.close()
+class Localidade:
+    def __init__(self, pais, numero_agencia, id=None):
+        self.id = id
+        self.pais = pais
+        self.numero_agencia = numero_agencia
 
-def listar_localidades():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, pais, numero_agencia FROM localidade")
-    localidades = cursor.fetchall()
-    conn.close()
-    return localidades
+    def salvar(self):
+        conn = get_connection()
+        cursor = conn.cursor()
+        if self.id is None:
+            cursor.execute(
+                """
+                INSERT INTO localidade (pais, numero_agencia)
+                VALUES (?, ?)
+                """,
+                (self.pais, self.numero_agencia)
+            )
+            self.id = cursor.lastrowid
+        else:
+            cursor.execute(
+                """
+                UPDATE localidade SET pais = ?, numero_agencia = ?
+                WHERE id = ?
+                """,
+                (self.pais, self.numero_agencia, self.id)
+            )
+        conn.commit()
+        conn.close()
 
-def buscar_localidade_por_id(localidade_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, pais, numero_agencia FROM localidade WHERE id = ?", (localidade_id,))
-    localidade = cursor.fetchone()
-    conn.close()
-    return localidade
+    def remover(self):
+        if self.id is None:
+            raise ValueError("Localidade não possui ID para remoção.")
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM localidade WHERE id = ?", (self.id,))
+        conn.commit()
+        conn.close()
 
-def atualizar_localidade(localidade_id, pais, numero_agencia):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        UPDATE localidade SET pais = ?, numero_agencia = ?
-        WHERE id = ?
-        """,
-        (pais, numero_agencia, localidade_id)
-    )
-    conn.commit()
-    conn.close()
+    @classmethod
+    def buscar_por_id(cls, localidade_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, pais, numero_agencia FROM localidade WHERE id = ?", (localidade_id,))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            return cls(id=row[0], pais=row[1], numero_agencia=row[2])
+        return None
 
-def remover_localidade(localidade_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM localidade WHERE id = ?", (localidade_id,))
-    conn.commit()
-    conn.close()
+    @classmethod
+    def listar_todas(cls):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, pais, numero_agencia FROM localidade")
+        localidades = [cls(id=row[0], pais=row[1], numero_agencia=row[2]) for row in cursor.fetchall()]
+        conn.close()
+        return localidades

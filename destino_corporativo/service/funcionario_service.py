@@ -1,7 +1,7 @@
 
 # service/funcionario_service.py
 # Service para regras de negócio e validação de Funcionário
-from models import funcionario
+from models.funcionario import Funcionario
 
 class FuncionarioService:
     def __init__(self):
@@ -13,24 +13,27 @@ class FuncionarioService:
             return False, "Nome, departamento e função são obrigatórios."
 
         # Checagem de duplicidade (nome já cadastrado)
-        funcionarios = funcionario.listar_funcionarios()
+        funcionarios = Funcionario.listar_todos()
         for f in funcionarios:
-            if f[1].strip().lower() == nome.strip().lower():
+            if f.nome.strip().lower() == nome.strip().lower():
                 return False, "Já existe um funcionário com este nome."
 
         try:
-            funcionario.inserir_funcionario(nome, departamento, funcao)
+            novo_funcionario = Funcionario(nome=nome, departamento=departamento, funcao=funcao)
+            novo_funcionario.salvar()
             return True, "Funcionário cadastrado com sucesso."
         except Exception as e:
             return False, f"Erro ao cadastrar funcionário: {str(e)}"
 
 
     def listar_funcionarios(self):
-        return funcionario.listar_funcionarios()
+        return Funcionario.listar_todos()
 
     def listar_viagens_do_funcionario(self, funcionario_id):
-        # Retorna todas as viagens do funcionário
-        viagens = funcionario.listar_viagens_do_funcionario(funcionario_id)
+        funcionario_obj = Funcionario.buscar_por_id(funcionario_id)
+        if not funcionario_obj:
+            return False, "Funcionário não encontrado."
+        viagens = funcionario_obj.listar_viagens()
         if viagens:
             return True, viagens
         else:
@@ -38,7 +41,7 @@ class FuncionarioService:
 
 
     def buscar_funcionario(self, funcionario_id):
-        f = funcionario.buscar_funcionario_por_id(funcionario_id)
+        f = Funcionario.buscar_por_id(funcionario_id)
         if f:
             return True, f
         else:
@@ -49,20 +52,29 @@ class FuncionarioService:
             return False, "Nome, departamento e função são obrigatórios."
 
         # Checagem de duplicidade (exceto o próprio)
-        funcionarios = funcionario.listar_funcionarios()
+        funcionarios = Funcionario.listar_todos()
         for f in funcionarios:
-            if f[0] != funcionario_id and f[1].strip().lower() == nome.strip().lower():
+            if f.id != funcionario_id and f.nome.strip().lower() == nome.strip().lower():
                 return False, "Já existe outro funcionário com este nome."
 
         try:
-            funcionario.atualizar_funcionario(funcionario_id, nome, departamento, funcao)
+            funcionario_obj = Funcionario.buscar_por_id(funcionario_id)
+            if not funcionario_obj:
+                return False, "Funcionário não encontrado."
+            funcionario_obj.nome = nome
+            funcionario_obj.departamento = departamento
+            funcionario_obj.funcao = funcao
+            funcionario_obj.salvar()
             return True, "Funcionário atualizado com sucesso."
         except Exception as e:
             return False, f"Erro ao atualizar funcionário: {str(e)}"
 
     def remover_funcionario(self, funcionario_id):
         try:
-            funcionario.remover_funcionario(funcionario_id)
+            funcionario_obj = Funcionario.buscar_por_id(funcionario_id)
+            if not funcionario_obj:
+                return False, "Funcionário não encontrado."
+            funcionario_obj.remover()
             return True, "Funcionário removido com sucesso."
         except Exception as e:
             return False, f"Erro ao remover funcionário: {str(e)}"
